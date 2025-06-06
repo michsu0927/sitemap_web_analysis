@@ -4,6 +4,9 @@ from typing import List, Optional
 from uuid import uuid4
 from pathlib import Path
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from .analyzer import analyze_urls
 from .utils import sitemap_parser, report_writer, task_index
@@ -65,7 +68,7 @@ async def get_urls(uid: str):
     urls_file = REPORTS_DIR / uid / "urls.txt"
     if not urls_file.exists():
         raise HTTPException(status_code=404, detail="URLs not found")
-    return PlainTextResponse(report_file.read_text())
+    return PlainTextResponse(urls_file.read_text())
 
 @app.get("/report/list")
 async def list_reports():
