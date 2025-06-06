@@ -1,7 +1,9 @@
 import asyncio
-from typing import List, Dict
+from typing import List, Dict, Optional
 import httpx
 from bs4 import BeautifulSoup
+
+from . import llm_analyzer
 
 async def fetch(session: httpx.AsyncClient, url: str) -> Dict:
     try:
@@ -17,7 +19,7 @@ async def fetch(session: httpx.AsyncClient, url: str) -> Dict:
     description = meta['content'].strip() if meta and meta.has_attr('content') else ''
     size = len(content.encode('utf-8'))
 
-    return {
+    result: Dict[str, Optional[str]] = {
         "url": url,
         "status_code": status,
         "title": title,
@@ -25,11 +27,17 @@ async def fetch(session: httpx.AsyncClient, url: str) -> Dict:
         "size": size,
     }
 
+    if llm_analyzer.is_configured():
+        analysis = await llm_analyzer.analyze_text(content)
+        if analysis:
+            result["llm_analysis"] = analysis
+
+    return result
+
 async def analyze_urls(urls: List[str]) -> List[Dict]:
     results: List[Dict] = []
-async def analyze_urls(session: httpx.AsyncClient, urls: List[str]) -> List[Dict]:
-    results: List[Dict] = []
-    tasks = [fetch(session, url) for url in urls]
-    for coro in asyncio.as_completed(tasks):
-        results.append(await coro)
+    async with httpx.AsyncClient(follow_redirects=True) as session:
+        tasks = [fetch(session, url) for url in urls]
+        for coro in asyncio.as_completed(tasks):
+            results.append(await coro)
     return results

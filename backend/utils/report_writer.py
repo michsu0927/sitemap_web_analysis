@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Dict, Optional
 import json
+import html
 
 TEMPLATE = """<html><head><title>Report {uid}</title></head><body><h1>Report {uid}</h1><pre>{data}</pre></body></html>"""
 

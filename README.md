@@ -74,7 +74,11 @@ source venv/bin/activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Start the server
+# 4. Configure environment variables (optional)
+cp .env.example .env
+# Edit .env with your Azure OpenAI credentials
+
+# 5. Start the server
 uvicorn main:app --reload
 ```
 🧠 API Overview
