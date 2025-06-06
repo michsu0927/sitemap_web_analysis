@@ -58,7 +58,7 @@ async def get_report_json(uid: str):
     report_file = REPORTS_DIR / uid / "report.json"
     if not report_file.exists():
         raise HTTPException(status_code=404, detail="Report not found")
-    return JSONResponse(json.loads(report_file.read_text()))
+    return JSONResponse(report_file.read_text())
 
 @app.get("/report/{uid}/urls.txt")
 async def get_urls(uid: str):
