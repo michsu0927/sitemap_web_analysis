@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 
 
 def parse_bytes(data: bytes) -> List[str]:
-    text = data.decode(errors='ignore')
+    text = data.decode('utf-8', errors='replace') # Or 'backslashreplace' to see bad chars
     text = text.strip()
     if text.startswith('<'):
         try:
