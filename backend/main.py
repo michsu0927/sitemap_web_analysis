@@ -65,7 +65,7 @@ async def get_urls(uid: str):
     urls_file = REPORTS_DIR / uid / "urls.txt"
     if not urls_file.exists():
         raise HTTPException(status_code=404, detail="URLs not found")
-    return PlainTextResponse(urls_file.read_text())
+    return PlainTextResponse(report_file.read_text())
 
 @app.get("/report/list")
 async def list_reports():
