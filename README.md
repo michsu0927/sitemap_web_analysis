@@ -158,6 +158,7 @@ task_index.json is auto-updated for each new task
 
 UUIDs are 8-char lowercase (uuid4().hex[:8])
 Limit Azure OpenAI usage with a max_tokens setting
+This repository now includes a minimal FastAPI backend located in `backend/`.
 
 ✅ TODO / Future Features
  Sitemap index parsing
