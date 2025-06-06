@@ -8,7 +8,7 @@ async def fetch(session: httpx.AsyncClient, url: str) -> Dict:
         resp = await session.get(url, timeout=10)
         status = resp.status_code
         content = resp.text
-    except Exception:
+    except httpx.RequestError:
         return {"url": url, "status_code": None, "error": "fetch_failed"}
 
     soup = BeautifulSoup(content, 'html.parser')
