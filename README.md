@@ -2,7 +2,7 @@ README.md for sitemap-analysis-tool
 
 # 🗺️ Sitemap Analysis Tool
 
-A website structure and SEO analyzer that accepts input from **Web frontend** or **CLI**. Each analysis task is assigned a UUID, and results are stored in HTML, JSON, and TXT formats for sharing, reporting, or programmatic use.
+A website structure and SEO analyzer that accepts input from **Web frontend** or **CLI**. Pages are rendered with Playwright and optionally analyzed with Azure OpenAI for semantic SEO scores. Each analysis task is assigned a UUID, and results are stored in HTML, JSON, and TXT formats for sharing, reporting, or programmatic use.
 
 ---
 
@@ -12,15 +12,19 @@ A website structure and SEO analyzer that accepts input from **Web frontend** or
   - ✅ Frontend (paste URLs or upload sitemap.xml)
   - ✅ CLI (upload `.txt` file of URLs)
 - Generates a unique UUID for each task
+- Renders each page with **Playwright** (headless Chromium) to capture full HTML
+- Optional AI analysis via **Azure OpenAI** (GPT-4/GPT-3.5) for SEO scoring and page classification
 - Analyzes each page for:
   - HTTP status code
   - Title
   - Meta description
   - Content size
   - Depth from root
+  - (optional) AI SEO score, page type, summary, and warnings
 - Generates:
   - `report.html`
   - `report.json`
+  - AI result section (`llm_analysis`) inside report.json
   - `urls.txt`
   - (for CLI) `input.txt`
 - Maintains task index (`task_index.json`)
@@ -34,6 +38,8 @@ sitemap-analysis-tool/
 ├── backend/
 │ ├── main.py
 │ ├── analyzer.py
+│ ├── browser_renderer.py
+│ ├── llm_analyzer.py
 │ ├── utils/
 │ │ ├── sitemap_parser.py
 │ │ ├── report_writer.py
@@ -51,9 +57,6 @@ sitemap-analysis-tool/
 ├── README.md
 └── requirements.txt
 
-yaml
-複製
-編輯
 
 ---
 
@@ -106,13 +109,11 @@ Returns all successfully analyzed URLs as plain text.
 Returns task_index.json, including all UUIDs and timestamps.
 
 📄 Example CLI Upload
-bash
-複製
-編輯
+```bash
 curl -X POST http://localhost:8000/cli/analyze \
   -F 'file=@urls.txt'
+```
 📂 Example Output (per task)
-graphql
 reports/
 └── fc9b5aee/
     ├── report.html         # Final HTML report
@@ -120,7 +121,7 @@ reports/
     ├── urls.txt            # Successfully analyzed URLs
     └── input.txt           # Original URL input (if CLI)
 🧪 Analysis Data Format (report.json)
-json
+```json
 {
   "uuid": "fc9b5aee",
   "analyzed_at": "2025-06-06T10:25:00",
@@ -134,10 +135,17 @@ json
       "title": "Home",
       "meta_description": "Welcome!",
       "depth": 0,
-      "size": 10458
+      "size": 10458,
+        "llm_analysis": {
+          "seo_score": 83,
+          "page_type": "首頁",
+          "summary": "這是一個產品展示頁，包含公司服務介紹",
+          "warnings": ["meta description 遺漏", "沒有 H2 標籤"]
+        }
     }
   ]
 }
+```
 🗃 Task Index (task_index.json)
 [
   { "uuid": "fc9b5aee", "created_at": "2025-06-06T10:25:00" },
@@ -149,6 +157,7 @@ All report files are written to backend/reports/<uuid>/
 task_index.json is auto-updated for each new task
 
 UUIDs are 8-char lowercase (uuid4().hex[:8])
+Limit Azure OpenAI usage with a max_tokens setting
 
 ✅ TODO / Future Features
  Sitemap index parsing
