@@ -27,8 +27,9 @@ async def fetch(session: httpx.AsyncClient, url: str) -> Dict:
 
 async def analyze_urls(urls: List[str]) -> List[Dict]:
     results: List[Dict] = []
-    async with httpx.AsyncClient(follow_redirects=True) as session:
-        tasks = [fetch(session, url) for url in urls]
-        for coro in asyncio.as_completed(tasks):
-            results.append(await coro)
+async def analyze_urls(session: httpx.AsyncClient, urls: List[str]) -> List[Dict]:
+    results: List[Dict] = []
+    tasks = [fetch(session, url) for url in urls]
+    for coro in asyncio.as_completed(tasks):
+        results.append(await coro)
     return results
