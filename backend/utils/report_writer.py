@@ -14,7 +14,7 @@ def write_report(base: Path, uid: str, results: List[Dict], urls: List[str], inp
     if input_txt:
         (task_dir / "input.txt").write_text(input_txt)
 
-    html_content = TEMPLATE.format(uid=uid, data=json.dumps(results, indent=2))
+    html_content = TEMPLATE.format(uid=uid, data=html.escape(json.dumps(results, indent=2)))
     (task_dir / "report.html").write_text(html_content)
 
     return task_dir
